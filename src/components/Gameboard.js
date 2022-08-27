@@ -1,8 +1,19 @@
 import Card from "./Card";
+import useHttp from "./http";
 
 const Gameboard = (props) => {
   const { addToMemory, resetHighScore } = props;
-  const data = [0,1,2,3,4,5,6,7,8,9,10,11];
+
+  const [isLoading, apiData] = useHttp('https://protected-taiga-89091.herokuapp.com/api/card', []);
+
+  const processData = (response) => {
+    return response.data.filter((element) => element.clowCard).map((element) => {
+      return {
+        name: element.englishName,
+        imageUrl: element.clowCard,
+      }
+    })
+  }
 
   const shuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -12,19 +23,27 @@ const Gameboard = (props) => {
     return array;
   }
 
-  const cardList = shuffle(data).map((element, index) => {
-    return (
-      <li key={index} onClick={() => addToMemory(element)}>
-        <Card cardName={element}/>
-      </li>
-    )
-  })
+  let cardList = (<p>Loading cards...</p>)
+
+  if (!isLoading && apiData) {
+    cardList = shuffle(processData(apiData)).map((element, index) => {
+      return (
+        <div key={index} onClick={() => addToMemory(element.name)}>
+          <Card cardName={element.name} imageUrl={element.imageUrl}/>
+        </div>
+      )
+    })
+  } else if (!isLoading && !apiData) {
+    cardList = (<p>Could not fetch any data.</p>)
+  }
+
+  console.log('gameboard render')
+  console.log(apiData);
+  if (apiData) console.log(processData(apiData))
 
   return (
-    <div className="Gameboard">
-      <ul>
-        {cardList}
-      </ul>
+    <div className="Gameboard" style={{display: "flex", flexWrap: "wrap"}}>
+      {cardList}
       <button onClick={resetHighScore}>Reset high score</button>
     </div>
   );

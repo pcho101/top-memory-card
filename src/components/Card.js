@@ -1,8 +1,8 @@
 const Card = (props) => {
-  const { cardName } = props;
+  const { cardName, imageUrl } = props;
   return (
     <div className="Card">
-      {cardName}
+      <img src={imageUrl} alt={cardName} style={{width: "210px"}}/>
     </div>
   );
 }

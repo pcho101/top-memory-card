@@ -24,10 +24,13 @@ const App = () => {
   }
 
   useEffect(() => {
-    setScore(memory.length);
+    if (memory.length !== score) {
+      setScore(memory.length);
+    }
     if (memory.length > highScore) {
       setHighScore(memory.length);
     }
+    console.log(memory)
   }, [memory]);
 
   return (
