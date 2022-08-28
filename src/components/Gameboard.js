@@ -1,48 +1,68 @@
+import { useEffect, useState } from "react";
 import Card from "./Card";
 import useHttp from "./http";
 
 const Gameboard = (props) => {
-  const { addToMemory, resetHighScore } = props;
+  const { addToMemory, score, resetHighScore } = props;
 
-  const [isLoading, apiData] = useHttp('https://protected-taiga-89091.herokuapp.com/api/card', []);
+  const level = 6;
 
-  const processData = (response) => {
-    return response.data.filter((element) => element.clowCard).map((element) => {
-      return {
-        name: element.englishName,
-        imageUrl: element.clowCard,
-      }
-    })
-  }
+  const [isLoading, fetchedData] = useHttp('https://protected-taiga-89091.herokuapp.com/api/card', []);
+  const [loadedCards, setLoadedCards] = useState(null);
 
   const shuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
+    console.log('shuffled')
     return array;
   }
 
+  if (fetchedData && !loadedCards) {
+    const filteredData = fetchedData.data.filter((element) => element.clowCard);
+    const shuffledData = shuffle(filteredData);
+    const slicedData = shuffledData.slice(0, level);
+    const mappedData = slicedData.map((element) => {
+      return {
+        name: element.englishName,
+        imageUrl: element.clowCard,
+      }
+    })
+    setLoadedCards(mappedData);
+  }
+
+  const clickToShuffle = () => {
+    setLoadedCards(shuffle([...loadedCards]));
+    console.log('clicktoshuffle')
+  }
+
+  useEffect(() => {
+    if (loadedCards) clickToShuffle();
+  }, [score])
+
   let cardList = (<p>Loading cards...</p>)
 
-  if (!isLoading && apiData) {
-    cardList = shuffle(processData(apiData)).map((element, index) => {
+  if (!isLoading && loadedCards) {
+    cardList = loadedCards.map((element, index) => {
       return (
-        <div key={index} onClick={() => addToMemory(element.name)}>
-          <Card cardName={element.name} imageUrl={element.imageUrl}/>
-        </div>
+        <Card
+          key={index}
+          cardName={element.name}
+          imageUrl={element.imageUrl}
+          clickHandler={addToMemory}
+        />
       )
     })
-  } else if (!isLoading && !apiData) {
+  } else if (!isLoading && !loadedCards) {
     cardList = (<p>Could not fetch any data.</p>)
   }
 
   console.log('gameboard render')
-  console.log(apiData);
-  if (apiData) console.log(processData(apiData))
 
   return (
     <div className="Gameboard" style={{display: "flex", flexWrap: "wrap"}}>
+      <button onClick={clickToShuffle}>Shuffle Board</button>
       {cardList}
       <button onClick={resetHighScore}>Reset high score</button>
     </div>
