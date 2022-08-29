@@ -6,23 +6,25 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [memory, setMemory] = useState([]);
-
-  const resetHighScore = () => {
-    setHighScore(0);
-  }
-
-  const resetMemory = () => {
-    setMemory([]);
-  }
+  const [level, setLevel] = useState(0);
 
   const addToMemory = (newValue) => {
     if (memory.includes(newValue)) {
-      resetMemory();
+      setMemory([]);
     } else {
       setMemory([...memory, newValue]);
     }
     console.log('added to memory')
   }
+
+  const numCards = [4, 8, 16, 25];
+
+  useEffect(() => {
+    if (highScore === numCards[level]) {
+      setMemory([]);
+      setLevel(level + 1);
+    }
+  }, [highScore])
 
   useEffect(() => {
     if (memory.length !== score) {
@@ -38,11 +40,16 @@ const App = () => {
 
   return (
     <div className="App">
-      <Scoreboard score={score} highScore={highScore}/>
+      <Scoreboard
+        level={level}
+        score={score}
+        highScore={highScore}
+      />
       <Gameboard
         addToMemory={addToMemory}
         score={score}
-        resetHighScore={resetHighScore}
+        level={level}
+        numCards={numCards}
       />
     </div>
   );

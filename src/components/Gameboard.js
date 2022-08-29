@@ -3,9 +3,7 @@ import Card from "./Card";
 import useHttp from "./http";
 
 const Gameboard = (props) => {
-  const { addToMemory, score, resetHighScore } = props;
-
-  const level = 6;
+  const { addToMemory, score, level, numCards } = props;
 
   const [isLoading, fetchedData] = useHttp('https://protected-taiga-89091.herokuapp.com/api/card', []);
   const [loadedCards, setLoadedCards] = useState(null);
@@ -19,10 +17,10 @@ const Gameboard = (props) => {
     return array;
   }
 
-  if (fetchedData && !loadedCards) {
+  const setupCards = (cards) => {
     const filteredData = fetchedData.data.filter((element) => element.clowCard);
     const shuffledData = shuffle(filteredData);
-    const slicedData = shuffledData.slice(0, level);
+    const slicedData = shuffledData.slice(0, cards);
     const mappedData = slicedData.map((element) => {
       return {
         name: element.englishName,
@@ -38,12 +36,26 @@ const Gameboard = (props) => {
   }
 
   useEffect(() => {
+    console.log('useEffect Level Change')
+    if (fetchedData) setLoadedCards(null);
+  }, [level])
+
+  useEffect(() => {
+    console.log('useEffect Score Change')
     if (loadedCards) clickToShuffle();
   }, [score])
+
+  console.log('gamebaord render start')
+
+  if (fetchedData && !loadedCards) {
+    setupCards(numCards[level]);
+    console.log('setup cards');
+  }
 
   let cardList = (<p>Loading cards...</p>)
 
   if (!isLoading && loadedCards) {
+    console.log('cardlist')
     cardList = loadedCards.map((element, index) => {
       return (
         <Card
@@ -62,9 +74,7 @@ const Gameboard = (props) => {
 
   return (
     <div className="Gameboard" style={{display: "flex", flexWrap: "wrap"}}>
-      <button onClick={clickToShuffle}>Shuffle Board</button>
       {cardList}
-      <button onClick={resetHighScore}>Reset high score</button>
     </div>
   );
 }
