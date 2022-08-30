@@ -73,7 +73,7 @@ const Gameboard = (props) => {
   console.log('gameboard render')
 
   return (
-    <div className="Gameboard" style={{display: "flex", flexWrap: "wrap"}}>
+    <div className="Gameboard">
       {cardList}
     </div>
   );

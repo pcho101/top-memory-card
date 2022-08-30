@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Scoreboard from "./components/Scoreboard";
 import Gameboard from "./components/Gameboard";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import './styles/App.css'
 
 const App = () => {
   const [score, setScore] = useState(0);
@@ -40,6 +43,7 @@ const App = () => {
 
   return (
     <div className="App">
+      <Header/>
       <Scoreboard
         level={level}
         score={score}
@@ -51,6 +55,7 @@ const App = () => {
         level={level}
         numCards={numCards}
       />
+      <Footer/>
     </div>
   );
 }
