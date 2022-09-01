@@ -3,7 +3,7 @@ import Card from "./Card";
 import useHttp from "./http";
 
 const Gameboard = (props) => {
-  const { addToMemory, score, level, numCards } = props;
+  const { addToMemory, score, level, numCards, mode } = props;
 
   const [isLoading, fetchedData] = useHttp('https://protected-taiga-89091.herokuapp.com/api/card', []);
   const [loadedCards, setLoadedCards] = useState(null);
@@ -24,7 +24,7 @@ const Gameboard = (props) => {
     const mappedData = slicedData.map((element) => {
       return {
         name: element.englishName,
-        imageUrl: element.clowCard,
+        imageUrl: mode ? element.sakuraCard : element.clowCard,
       }
     })
     setLoadedCards(mappedData);
@@ -34,6 +34,11 @@ const Gameboard = (props) => {
     setLoadedCards(shuffle([...loadedCards]));
     console.log('clicktoshuffle')
   }
+
+  useEffect(() => {
+    console.log('useEffect Mode Change')
+    if (fetchedData) setLoadedCards(null);
+  }, [mode])
 
   useEffect(() => {
     console.log('useEffect Level Change')
