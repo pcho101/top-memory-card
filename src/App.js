@@ -14,7 +14,7 @@ const App = () => {
   const [mode, setMode] = useState(0);
 
   const changeMode = () => {
-    setMode(!mode);
+    setMode(mode ? 0 : 1);
     setMemory([]);
   }
 
@@ -51,12 +51,14 @@ const App = () => {
   return (
     <div className="App">
       <Header/>
-      <button onClick={changeMode}>Change Mode</button>
-      <Toggle />
       <Scoreboard
         level={level}
         score={score}
         highScore={highScore}
+      />
+      <Toggle
+        mode={mode}
+        changeMode={changeMode}
       />
       <Gameboard
         addToMemory={addToMemory}
